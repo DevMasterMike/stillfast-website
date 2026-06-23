@@ -11,7 +11,7 @@
   --separator: #262d3a;
   --text: #f5f7fa;
   --text-2: #98a1b2;
-  --text-3: #6b7484;
+  --text-3: #828b9b;   /* lightened to meet WCAG AA 4.5:1 on both bg and surface */
   --accent: #2ff0cf;
   --accent-2: #00c2a3;
   --max: 1080px;
@@ -36,6 +36,19 @@ body {
 a { color: var(--accent); text-decoration: none; transition: color 0.2s var(--ease); }
 a:hover { color: #fff; }
 
+/* ---------- Accessibility ---------- */
+/* Clearly visible keyboard focus on the dark theme (WCAG 2.4.7 Focus Visible). */
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+/* Skip-to-content link, visually hidden until focused (WCAG 2.4.1 Bypass Blocks). */
+.skip-link {
+  position: absolute; left: 12px; top: -64px; z-index: 100;
+  background: var(--accent); color: #04221d; font-weight: 600;
+  padding: 10px 16px; border-radius: 10px; transition: top 0.2s var(--ease);
+}
+.skip-link:focus { top: 12px; color: #04221d; }
+/* Comfortable 24px+ hit targets for inline links (WCAG 2.5.8 Target Size). */
+.nav a, .site-footer .links a { display: inline-flex; align-items: center; min-height: 24px; padding: 6px 2px; }
+
 .container { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
 .narrow { max-width: 760px; }
 
@@ -57,7 +70,13 @@ a:hover { color: #fff; }
 .nav { display: flex; gap: 28px; }
 .nav a { color: var(--text-2); font-weight: 500; font-size: 15px; }
 .nav a:hover { color: var(--text); }
-@media (max-width: 620px) { .nav { gap: 18px; } .nav a { font-size: 14px; } }
+/* Small screens: stack the wordmark over a wrapping nav so 5 links + the wordmark never overflow
+   a 320px viewport (WCAG 1.4.10 Reflow). */
+@media (max-width: 600px) {
+  .site-header .container { height: auto; flex-direction: column; gap: 6px; padding-top: 9px; padding-bottom: 9px; }
+  .nav { gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .nav a { font-size: 14px; }
+}
 
 /* ---------- Buttons ---------- */
 .btn {
@@ -79,6 +98,12 @@ a:hover { color: #fff; }
 .appstore { display: inline-flex; transition: transform 0.2s var(--ease); }
 .appstore img { height: 54px; width: auto; display: block; }
 .appstore:hover { transform: translateY(-2px); }
+/* Pre-launch: the app is not on the store yet, so the badge is a non-interactive "coming soon"
+   marker (an honest, non-broken alternative to a link that goes nowhere). */
+.appstore-soon { align-items: center; gap: 12px; cursor: default; }
+.appstore-soon:hover { transform: none; }
+.appstore-soon img { opacity: 0.45; }
+.appstore-soon .soon-tag { color: var(--text-2); font-weight: 600; font-size: 14px; letter-spacing: 0.03em; white-space: nowrap; }
 
 /* ---------- Hero ---------- */
 .hero {
@@ -109,7 +134,7 @@ a:hover { color: #fff; }
 
 /* ---------- Phone mockup ---------- */
 .phone {
-  --w: 300px;
+  --w: min(300px, 78vw);   /* responsive so it never overflows a 320px viewport (WCAG 1.4.10 Reflow) */
   width: var(--w); aspect-ratio: 300 / 620; flex: none;
   border-radius: 46px; background: linear-gradient(160deg, #20242e, #0a0c11);
   padding: 11px;
@@ -133,7 +158,8 @@ a:hover { color: #fff; }
 /* ---------- Video showcase ---------- */
 .showcase { text-align: center; }
 .video-wrap {
-  margin: 52px auto 0; max-width: 340px;
+  position: relative;
+  margin: 52px auto 0; max-width: min(340px, 82vw);
   border-radius: 30px;
   background: radial-gradient(70% 60% at 50% 0%, rgba(47, 240, 207, 0.12), transparent 70%);
 }
@@ -141,6 +167,20 @@ a:hover { color: #fff; }
   width: 100%; height: auto; display: block; border-radius: 24px;
   box-shadow: 0 60px 140px -45px rgba(0, 0, 0, 0.85), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
+/* Accessible play/pause control so the auto-playing loop can be stopped (WCAG 2.2.2 Pause, Stop, Hide). */
+.video-toggle {
+  position: absolute; bottom: 16px; right: 16px; z-index: 3;
+  width: 44px; height: 44px; border-radius: 50%; border: none; cursor: pointer;
+  background: rgba(6, 8, 13, 0.66); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  transition: background 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.video-toggle:hover { background: rgba(6, 8, 13, 0.9); transform: scale(1.05); }
+.video-toggle svg { width: 16px; height: 16px; display: block; }
+.video-toggle .icon-play { display: none; }
+.video-toggle.is-paused .icon-pause { display: none; }
+.video-toggle.is-paused .icon-play { display: block; }
 
 /* Screen: reaction result */
 .scr-react {
@@ -176,6 +216,9 @@ a:hover { color: #fff; }
 /* ---------- Sections ---------- */
 section { padding: 92px 0; }
 .eyebrow-c { text-align: center; }
+/* Headings break rather than overflow on very narrow viewports (WCAG 1.4.10). */
+h1, h2, h3 { overflow-wrap: break-word; }
+@media (max-width: 480px) { .hero h1 br, .final h2 br { display: none; } }
 .section-title { font-size: clamp(32px, 5.4vw, 56px); font-weight: 700; letter-spacing: -0.03em; text-align: center; line-height: 1.06; }
 .section-sub { color: var(--text-2); text-align: center; margin: 16px auto 0; max-width: 600px; font-size: clamp(17px, 2.2vw, 20px); }
 

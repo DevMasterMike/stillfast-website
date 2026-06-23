@@ -14,6 +14,7 @@
   <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
+  <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="container">
       <a class="wordmark" href="index.html"><span class="bolt"><svg class="bolt-svg" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2 L4.5 13.2 L11 13.2 L9.6 22 L19.2 9.4 L12 9.4 Z"/></svg></span>STILLFAST</a>
@@ -27,15 +28,15 @@
     </div>
   </header>
 
-  <main>
+  <main id="main">
     <!-- Hero -->
     <section class="hero">
       <div class="container">
         <span class="eyebrow">Reaction trainer</span>
-        <h1>A still mind.<br />Fast reactions.</h1>
+        <h1>A still mind. <br /> Fast reactions.</h1>
         <p class="tagline">A two-minute reaction warm-up before every game, with a real number you can watch session over session. A fresh set of drills, on your iPhone.</p>
         <div class="cta">
-          <a class="appstore" href="#" aria-label="Download Stillfast on the App Store"><img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=540x180" alt="Download on the App Store" loading="lazy" /></a>
+          <span class="appstore appstore-soon" role="img" aria-label="Coming soon on the App Store"><img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=540x180" alt="" loading="lazy" /><span class="soon-tag">Coming soon</span></span>
           <a class="btn-ghost" href="#features">See how it works <span class="arrow">&rarr;</span></a>
         </div>
         <p class="fineprint">iPhone and iPad &middot; Private by design &middot; No ads, no tracking</p>
@@ -59,11 +60,15 @@
         <h2 class="section-title reveal">Two minutes, then a number</h2>
         <p class="section-sub reveal">A fresh set of reaction drills, tuned to your sport, then a clean read on how you’re reacting today.</p>
         <div class="video-wrap reveal">
-          <video class="demo-video" autoplay muted loop playsinline preload="none"
-                 poster="stillfast-demo-poster.jpg" aria-label="A walkthrough of Stillfast: a reaction drill and your result.">
+          <video class="demo-video" id="demoVideo" autoplay muted loop playsinline preload="none"
+                 poster="stillfast-demo-poster.jpg" aria-label="A silent walkthrough of Stillfast: a reaction drill and your result.">
             <source src="stillfast-demo.mp4" type="video/mp4" />
             <img src="stillfast-demo-poster.jpg" alt="Stillfast reaction drill in progress." />
           </video>
+          <button type="button" class="video-toggle" id="demoToggle" aria-label="Pause video">
+            <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+            <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+          </button>
         </div>
       </div>
     </section>
@@ -166,9 +171,9 @@
     <!-- Final CTA -->
     <section class="final">
       <div class="container">
-        <h2 class="reveal">Warm up your reactions.<br />Walk out switched on.</h2>
+        <h2 class="reveal">Warm up your reactions. <br /> Walk out switched on.</h2>
         <div class="cta reveal">
-          <a class="appstore" href="#" aria-label="Download Stillfast on the App Store"><img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=540x180" alt="Download on the App Store" loading="lazy" /></a>
+          <span class="appstore appstore-soon" role="img" aria-label="Coming soon on the App Store"><img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=540x180" alt="" loading="lazy" /><span class="soon-tag">Coming soon</span></span>
         </div>
       </div>
     </section>
@@ -201,6 +206,26 @@
         });
       }, { rootMargin: '0px 0px -10% 0px', threshold: 0.08 });
       document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+    })();
+
+    // Accessible play/pause for the demo loop (WCAG 2.2.2). Respects reduced-motion: do not autoplay.
+    (function () {
+      var v = document.getElementById('demoVideo');
+      var btn = document.getElementById('demoToggle');
+      if (!v || !btn) return;
+      function reflect() {
+        var paused = v.paused;
+        btn.classList.toggle('is-paused', paused);
+        btn.setAttribute('aria-label', paused ? 'Play video' : 'Pause video');
+      }
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) { v.removeAttribute('autoplay'); try { v.pause(); } catch (e) {} }
+      btn.addEventListener('click', function () {
+        if (v.paused) { v.play(); } else { v.pause(); }
+      });
+      v.addEventListener('play', reflect);
+      v.addEventListener('pause', reflect);
+      reflect();
     })();
   </script>
 </body>
